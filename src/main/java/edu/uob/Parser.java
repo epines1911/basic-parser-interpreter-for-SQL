@@ -147,6 +147,7 @@ public class Parser {
         if (t.value.equals("INTO")) {
             t = tokenizer.nextToken(); // t should be <TableName>
             if (t.isPlainText()) {
+                String tableName = t.value;
                 t = tokenizer.nextToken(); // t should be "VALUES"
                 t.value.toUpperCase();
                 // todo 我没有成功在tokenizer里搞定"VALUE("这个东西。或许变成两个token也没关系。先按两个token写了。
@@ -154,17 +155,27 @@ public class Parser {
                     t = tokenizer.nextToken(); // t should be "("
                     if (t.value.equals("(")) {
                         t = tokenizer.nextToken(); // t should be <ValueList>
-                        parseValueList(t);
+                        InsertCMD insertCMD = new InsertCMD(ctrl, tableName);
+                        parseValueList(t, insertCMD);
                     } else throw new DBException("No '('?");
                 } else throw new DBException("No 'VALUES('?");
             } else throw new DBException("Table name is invalid");
         } else throw new DBException("No 'INTO'?");
     }
 
-    private void parseValueList(Token t) {
-//        t should be <ValueList>
+    private void parseValueList(Token t, InsertCMD cmd) throws DBException {
+//        t should be <ValueList> -- <Value>
 // todo <ValueList> ::=  <Value> | <Value> "," <ValueList>
 // todo <Value> ::= "'" <StringLiteral> "'" | <BooleanLiteral> | <FloatLiteral> | <IntegerLiteral> | "NULL"
+        if (t.isStringLiteral() || t.isBoolLiteral() || t.isFloatLiberal() || t.isIntegerLiberal()) {
+            cmd.addValue(t.value);
+            t = tokenizer.nextToken(); // t should be "," or ";"
+            if (t.value.equals(",")) {
+                t = tokenizer.nextToken(); // t should be <ValueList>
+                parseValueList(t, cmd);
+            } else if (t.value.equals(";")) {
+            } else throw new DBException("No ','?");
+        } else throw new DBException("The format of value is wrong, please check it");
     }
 
     public String getMessage() {

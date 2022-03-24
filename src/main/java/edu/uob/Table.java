@@ -55,6 +55,7 @@ public class Table {
     }
 
     public int getColNum() {
+        setColNum();
         return colNum;
     }
 

@@ -6,8 +6,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 // PLEASE READ:
 // The tests in this file will fail by default for a template skeleton, your job is to pass them
@@ -58,5 +57,41 @@ final class DBTests {
     assertEquals(server.getDbCtrl().getDBByName("aa").name, "aa");
   }
   //todo 测两个括号中间没内容的情况。
+
+  @Test
+  void testIsFloatLiteral() {
+    Token t = new Token("+145.768");
+    assertTrue(t.isFloatLiberal());
+    t = new Token("-42.29509");
+    assertTrue(t.isFloatLiberal());
+    t = new Token("000756.2958");
+    assertTrue(t.isFloatLiberal());
+    t = new Token("+137.2349eeafe");
+    assertFalse(t.isFloatLiberal());
+    t = new Token("-13af7.29ag5");
+    assertFalse(t.isFloatLiberal());
+    t = new Token("dsfja");
+    assertFalse(t.isFloatLiberal());
+  }
+
+  @Test
+  void testIsIntegerLiteral() {
+    Token t = new Token("+145");
+    assertTrue(t.isIntegerLiberal());
+    t = new Token("-42");
+    assertTrue(t.isIntegerLiberal());
+    t = new Token("000756");
+    assertTrue(t.isIntegerLiberal());
+    t = new Token("+1379eeafe");
+    assertFalse(t.isIntegerLiberal());
+    t = new Token("-13af729ag5");
+    assertFalse(t.isIntegerLiberal());
+    t = new Token("dsfja");
+    assertFalse(t.isIntegerLiberal());
+  }
+
+  //todo is string literal
+  //todo test "VALUE(())"
+
 
 }

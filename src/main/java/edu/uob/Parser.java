@@ -7,7 +7,6 @@ import java.util.Objects;
 public class Parser {
     private Tokenizer tokenizer;
     private DBController ctrl;
-    //todo 主要是为了返回【ok】和调用server里的database。我搞了个controller替代这些东西
     private String message;
 
     public Parser(DBController controller, String command) {
@@ -22,7 +21,6 @@ public class Parser {
         if (!Objects.equals(tokenizer.lastToken().value, ";")) {
             throw new DBException("Missing semicolon");
         }
-        //todo???
         String commandType = tokenizer.firstToken().value;
         switch (commandType) {
             case "USE":
@@ -363,7 +361,6 @@ public class Parser {
     }
 
     public String getMessage() {
-//        System.out.println(message); //todo for test
         return message;
     }
 }

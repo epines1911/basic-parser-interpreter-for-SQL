@@ -41,7 +41,6 @@ public class SelectCMD extends DBcmd{
         for (int i = 0; i < num; i++) {
             result += aimTB.createTableRow(i);
         }
-        System.out.println(result); //todo delete
     }
 
     @Override

@@ -99,14 +99,14 @@ public class Table {
         return result.toString();
     }
 //todo
-//    public String newLimitRecord() {
-//        StringBuilder result = new StringBuilder();
-//        return result.toString();
-//    }
-//
-//    public void newLimitAttrib() {
-//        // for selecting some columns and make a new table
-//    }
+    public String newLimitRecord() {
+        StringBuilder result = new StringBuilder();
+        return result.toString();
+    }
+
+    public void newLimitAttrib() {
+        // for selecting some columns and make a new table
+    }
 
     public String getName() {
         return name;

@@ -3,8 +3,12 @@ package edu.uob;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,9 +49,9 @@ final class DBTests {
   // rows are actually inserted)
   @Test
   void testUseCmd() {
-    server.handleCommand("Create DATABASE aa ;");
-    server.handleCommand("uSE aa ;");
-    assertTrue(server.handleCommand("uSE aa ;").startsWith("[OK]"));
+    server.handleCommand("Create DATABASE aa;");
+    server.handleCommand("uSE aa;");
+    assertTrue(server.handleCommand("uSE aa;").startsWith("[OK]"));
     assertEquals(server.getDbCtrl().getCurrentDB().name, "aa");
   }
   @Test
@@ -56,22 +60,20 @@ final class DBTests {
     assertTrue(server.handleCommand("Create DatABASe aa;").startsWith("[OK]"));
     assertEquals(server.getDbCtrl().getDBByName("aa").name, "aa");
   }
-  //todo 测两个括号中间没内容的情况。
 
-  @Test
-  void testIsFloatLiteral() {
-    Token t = new Token("+145.768");
-    assertTrue(t.isFloatLiberal());
-    t = new Token("-42.29509");
-    assertTrue(t.isFloatLiberal());
-    t = new Token("000756.2958");
-    assertTrue(t.isFloatLiberal());
-    t = new Token("+137.2349eeafe");
+  @ParameterizedTest
+  @ValueSource(strings = {"+137.2349eeafe", "-13af7.29ag5", "dsfja"})
+  void testIsFloatFalse(String value) {
+    Token t = new Token(value);
     assertFalse(t.isFloatLiberal());
-    t = new Token("-13af7.29ag5");
-    assertFalse(t.isFloatLiberal());
-    t = new Token("dsfja");
-    assertFalse(t.isFloatLiberal());
+  }
+
+
+  @ParameterizedTest
+  @ValueSource(strings = {"+145.768", "-42.29509", "000756.2958"})
+  void testIsFloatTrue(String value) {
+    Token t = new Token(value);
+    assertTrue(t.isFloatLiberal());
   }
 
   @Test
@@ -80,18 +82,48 @@ final class DBTests {
     assertTrue(t.isIntegerLiberal());
     t = new Token("-42");
     assertTrue(t.isIntegerLiberal());
-    t = new Token("000756");
+    t = new Token("00756980");
     assertTrue(t.isIntegerLiberal());
     t = new Token("+1379eeafe");
     assertFalse(t.isIntegerLiberal());
     t = new Token("-13af729ag5");
     assertFalse(t.isIntegerLiberal());
-    t = new Token("dsfja");
+    t = new Token("ds1543fja123");
     assertFalse(t.isIntegerLiberal());
   }
 
-  //todo is string literal
-  //todo test "VALUE(())"
+  @ParameterizedTest
+  @ValueSource(strings = {"'d*&#63('", "'0(09)'", "sd'kf'", "'sdj.'f", "sd'f"})
+  void testIsStringLiteral1(String clip) {
+    Token t = new Token(clip);
+    assertTrue(t.isStringLiteral());
+  }
 
+//  @ParameterizedTest
+//  @ValueSource(strings = {
+//          "Create table people(aa,bb,adfas);",
+//          "INSERT INTO people VALUES((),'d*&#63(','0(09)',TRUE,145.098,0970,',0')",
+//          "select * from sldfj where name==0",
+//          "select * from sldfj where (age<=167)and(gender!='male');"})
+//  void testModifyCommand(String command) {
+//    Tokenizer tokenizer = new Tokenizer(command);
+//  }
+
+  @Test
+  void testMultipleCmds() {
+    server.handleCommand("Create DATABASE aa;");
+    server.handleCommand("uSE aa;");
+    server.handleCommand("create table ea;");
+    server.handleCommand("create table cada(name, age, school);");
+    server.handleCommand("insert into cada values('ww', 18, 'abcd1');");
+    server.handleCommand("insert into cada values('rr', 21, 'qwer2');");
+    server.handleCommand("create table adfs;");
+    server.handleCommand("drop table ea;");
+    server.handleCommand("alter table cada drop school;");
+    server.handleCommand("alter table cada add school2;");
+    assertTrue(server.handleCommand("select * from cada;").startsWith("[OK]"));
+    server.handleCommand("drop database aa;");
+    //todo
+  }
 
 }

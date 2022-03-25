@@ -10,20 +10,25 @@ public class AlterCMD {
 
     private void addCol(Table tb, String colName) {
         Attribute newAttribute = new Attribute();
+        int recordsNum = tb.valueList.get(0).col.size();
+        for (int i = 0; i < recordsNum; i++) {
+            newAttribute.col.add("");
+        }
         newAttribute.name = colName;
         tb.valueList.add(newAttribute);
         tb.setColNum();
-        tb.setFirstItemAsNull(); //todo 在这里有必要这么做吗？不这么做，那就需要把Attribute的第一个元素赋值为colName
+        tb.setAttributesName();
     }
 
     private void deleteCol(Table tb, String colName) throws DBException {
         Boolean isFound = false;
-        for (Attribute col:
-             tb.valueList) {
-            if (col.name.equals(colName)) {
+        for (int i = 0; i < tb.valueList.size(); i++) {
+            String name = tb.valueList.get(i).name;
+            if (name.equals(colName)) {
                 isFound = true;
-                tb.valueList.remove(col);
+                tb.valueList.remove(i);
                 tb.setColNum();
+                tb.deleteAttributeName(colName);
             }
         }
         if (!isFound) {

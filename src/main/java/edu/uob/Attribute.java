@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Attribute {
     String name;
-    ArrayList<Object> col;
+    ArrayList<String> col;
     public Attribute() {
         col = new ArrayList<>();
     }

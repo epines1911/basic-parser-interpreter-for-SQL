@@ -1,9 +1,12 @@
 package edu.uob;
 
+import java.util.ArrayList;
+
 public class InsertCMD {
-    String tbName;
-    Table aimTB;
-    int valueCounter;
+    private String tbName;
+    private Table aimTB;
+    private int valueCounter;
+    private ArrayList<String> values = new ArrayList<>();
     public InsertCMD(DBController ctrl, String tableName) {
         tbName = tableName;
         aimTB = (Table) ctrl.getCurrentDB().tables.get(tableName);
@@ -14,10 +17,18 @@ public class InsertCMD {
         if (aimTB == null) {
             throw new DBException("There is no table named "+tbName);
         }
-        int colNum = aimTB.getColNum();
-        if (valueCounter < colNum) {
-            aimTB.valueList.get(valueCounter).col.add(value);
-            valueCounter += 1;
-        } else throw new DBException("The number of value is larger than the number of attributes");
+        values.add(value);
+        int insertColNum = aimTB.getColNum() - 1;
+        if (values.size() == insertColNum) {
+            aimTB.idCounter();
+            for (String eachValue :
+                    values) {
+                aimTB.valueList.get(valueCounter + 1).col.add(eachValue);
+                valueCounter += 1;
+            }
+        }
+        if (valueCounter > insertColNum) {
+            throw new DBException("The number of value is larger than the number of attributes");
+        } //todo value counter less than insert col num
     }
 }

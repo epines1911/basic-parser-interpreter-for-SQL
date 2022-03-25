@@ -15,7 +15,10 @@ public final class DBServer {
   private Database db; // todo 后面如果根据名字查找database和table的话，我可以不可以用字典管理这一堆database和table？
 
   public static void main(String[] args) throws IOException {
-    new DBServer(Paths.get(".").toAbsolutePath().toFile()).blockingListenOn(8888);
+//    new DBServer(Paths.get(".").toAbsolutePath().toFile()).blockingListenOn(8888);
+// todo 上面这行改回来
+    new DBServer(Paths.get("mydb").toAbsolutePath().toFile()).blockingListenOn(8888);
+    //todo 记得删掉mydb文件夹再交
   }
 
   /**
@@ -32,8 +35,8 @@ public final class DBServer {
    */
   public DBServer(File databaseDirectory) {
     // TODO implement your server logic here
-    dbCtrl = new DBController();
-//    db = new Database();
+    dbCtrl = new DBController(databaseDirectory.getAbsolutePath());
+
 //    try {
 //      readFileAndStoreData("people.tab");
 //      writer("people.tab", (Table) db.tables.get("people"));
@@ -50,13 +53,14 @@ public final class DBServer {
    */
   public String handleCommand(String command) {
     // TODO implement your server logic here
-    p = new Parser(dbCtrl, command);
     try {
+      p = new Parser(dbCtrl, command);
       p.parse();
     } catch (DBException e) {
+      return e.getMessage();
+    } catch (IOException e) {
       e.printStackTrace();
     }
-//    return "[OK] Thanks for your message: " + command; // todo for test
     return "[OK]\n" + p.getMessage();
   }
 
@@ -113,7 +117,7 @@ public final class DBServer {
     }
   }
 
-  private void readFileAndStoreData(String fileName) throws IOException {
+  private void readFileAndStoreData(String fileName) throws IOException, DBException {
     // E:\CS-C1021\OOPJava\java-exercise\cwdb-files // todo just a note
     String filePath = "E:" + File.separator + fileName; //todo
     File newFile = new File(filePath);

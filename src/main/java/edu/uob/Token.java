@@ -4,31 +4,31 @@ import java.util.ArrayList;
 
 public class Token {
     String value;
-    private ArrayList<Integer> ASCIIList;
-    private TokenType type; // todo maybe delete
+//    private ArrayList<Integer> ASCIIList; //todo maybe delete
+//    private TokenType type; // todo maybe delete
 
     public Token(String clip) {
         //todo
         value = clip;
     }
 
-    private void setASCIIList() {
-        if (value != null) {
-            ASCIIList = new ArrayList<Integer>();
-            char[] chars = value.toCharArray();
-            for (char character : chars) {
-                ASCIIList.add((int) character);
-            }
-        }
-    }
-    // todo maybe delete
-    public TokenType getType() {
-        return type;
-    }
-    // todo maybe delete
-    public void setType() {
-        // todo analyze the type of token using ASCII, and change the value of this.type
-    }
+//    private void setASCIIList() {
+//        if (value != null) {
+//            ASCIIList = new ArrayList<Integer>();
+//            char[] chars = value.toCharArray();
+//            for (char character : chars) {
+//                ASCIIList.add((int) character);
+//            }
+//        }
+//    }
+//    // todo maybe delete
+//    public TokenType getType() {
+//        return type;
+//    }
+//    // todo maybe delete
+//    public void setType() {
+//        // todo analyze the type of token using ASCII, and change the value of this.type
+//    }
     
     public boolean isPlainText() {
         if (value == null) {return false;}
@@ -39,7 +39,7 @@ public class Token {
                 return false;
             }
         }
-        return true; //todo use regex
+        return true; //todo use regex?
     }
 
     public boolean isUpperCase() { //todo 似乎是create这种commandType不需要强制全大写，create database这俩也不需要强制全大写。所以这个功能可能用不到了
@@ -69,7 +69,8 @@ public class Token {
     public boolean isBoolLiteral() {
         if (value == null) {return false;}
         String boolLiteral = value.toUpperCase();
-        return boolLiteral.equals("TRUE") || boolLiteral.equals("FALSE");
+        return boolLiteral.equalsIgnoreCase("TRUE")
+                || boolLiteral.equalsIgnoreCase("FALSE");
     }
 
     public boolean isFloatLiberal() {
@@ -82,6 +83,27 @@ public class Token {
         if (value == null) {return false;}
         String strForCheck = value;
         return strForCheck.matches("^[+-]?[0-9]+$");
+    }
+
+    public boolean isValue() {
+        return isStringLiteral() || isBoolLiteral() || isFloatLiberal()
+                || isIntegerLiberal() || value.equalsIgnoreCase("NULL");
+    }
+
+    public String removeQuoteInToken() {
+        String strForRemove = value;
+        if (this.isStringLiteral()) {
+            int length = strForRemove.length();
+            strForRemove = strForRemove.substring(1, length - 1);
+        }
+        return strForRemove;
+    }
+
+    public boolean isOperator() {
+        if (value == null) return false;
+        return value.equals("==") || value.equals(">") || value.equals("<")
+                || value.equals(">=") || value.equals("<=") || value.equals("!=")
+                || value.equalsIgnoreCase("LIKE");
     }
 
 

@@ -1,22 +1,24 @@
 package edu.uob;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class Parser {
     private Tokenizer tokenizer;
     private DBController ctrl;
-    //todo 我看图是要传server进来用，但我其实不理解为啥要传这个进来。也没想明白传进来怎么用它。
-    //主要是为了返回【ok】和调用server里的database。我搞了个controller替代这些东西
+    //todo 主要是为了返回【ok】和调用server里的database。我搞了个controller替代这些东西
     private String message;
 
     public Parser(DBController controller, String command) {
-        tokenizer = new Tokenizer(command);
-        ctrl = controller; //todo 我看图是要传server进来用，但我其实不理解为啥要传这个进来。也没想明白传进来怎么用它。
+        if (controller != null && command != null) {
+            tokenizer = new Tokenizer(command);
+            ctrl = controller;
+        }
         message = "";
     }
 
-    public void parse() throws DBException {
+    public void parse() throws DBException, IOException {
         if (!Objects.equals(tokenizer.lastToken().value, ";")) {
             throw new DBException("Missing semicolon");
         }
@@ -39,14 +41,15 @@ public class Parser {
                 parseInsertCmd(tokenizer.nextToken());
                 break;
             case "SELECT":
-                System.out.println("???");
-//                new SelectCMD();
-            case "UPDATE":
-                new UpdateCMD();
-            case "DELETE":
-                new DeleteCMD();
-            case "JOIN":
-                new JoinCMD();
+                parseSelectCmd(tokenizer.nextToken());
+                break;
+                //todo
+//            case "UPDATE":
+//                new UpdateCMD();
+//            case "DELETE":
+//                new DeleteCMD();
+//            case "JOIN":
+//                new JoinCMD();
             default:
                 throw new DBException("The first word in command is wrong");
         }
@@ -59,15 +62,14 @@ public class Parser {
         } else throw new DBException("Database name should be plain text");
     }
 
-    private void parseCreateCmd(Token t) throws DBException {
+    private void parseCreateCmd(Token t) throws DBException, IOException {
         // t should be "DATABASE" or "TABLE"
-        t.value.toUpperCase();
-        if (t.value.equals("DATABASE")) {
+        if (t.value.equalsIgnoreCase("DATABASE")) {
             t = tokenizer.nextToken(); // t should be <DatabaseName>
             if (t.isPlainText()) {
                 new CreateCMD(ctrl, t.value, null, true);
             } else throw new DBException("Database name is invalid");
-        } else if (t.value.equals("TABLE")) {
+        } else if (t.value.equalsIgnoreCase("TABLE")) {
             t = tokenizer.nextToken(); // t should be <TableName>
             if (t.isPlainText()) {
                 parseTableName(t);
@@ -75,7 +77,7 @@ public class Parser {
         } else throw new DBException("No 'DATABASE' or 'TABLE'?");
     }
 
-    private void parseTableName(Token t) throws DBException {
+    private void parseTableName(Token t) throws DBException, IOException {
         // t should be <TableName>
         String tableName = t.value;
         t = tokenizer.nextToken(); // t should be ";" or "("
@@ -88,7 +90,7 @@ public class Parser {
         } else throw new DBException("Missing '('?");
     }
 
-    private void parseAttributeList(Token t, ArrayList attribute, String tableName) throws DBException {
+    private void parseAttributeList(Token t, ArrayList<String> attribute, String tableName) throws DBException, IOException {
         // t should be <AttributeList> -- <AttributeName>
         if (t.isPlainText()) {
             attribute.add(t.value);
@@ -104,13 +106,12 @@ public class Parser {
 
     private void parseDropCmd(Token t) throws DBException {
         // t should be "DATABASE" or "TABLE"
-        t.value.toUpperCase();
-        if (t.value.equals("DATABASE")) {
+        if (t.value.equalsIgnoreCase("DATABASE")) {
             t = tokenizer.nextToken(); // t should be <DatabaseName>
             if (t.isPlainText()) {
                 new DropCMD(ctrl, t.value, true);
             } else throw new DBException("Database name is invalid");
-        } else if (t.value.equals("TABLE")) {
+        } else if (t.value.equalsIgnoreCase("TABLE")) {
             t = tokenizer.nextToken(); // t should be <TableName>
             if (t.isPlainText()) {
                 new DropCMD(ctrl, t.value, false);
@@ -120,19 +121,18 @@ public class Parser {
 
     private void parseAlterCmd(Token t) throws DBException {
         // t should be "TABLE"
-        t.value.toUpperCase();
-        if (t.value.equals("TABLE")) {
+        if (t.value.equalsIgnoreCase("TABLE")) {
             t = tokenizer.nextToken(); // t should be <TableName>
             if (t.isPlainText()) {
                 String tableName = t.value;
                 t = tokenizer.nextToken(); // t should be <AlterationType>
-                t.value.toUpperCase();
-                if (t.value.equals("ADD")) {
+                if (t.value.equalsIgnoreCase("ADD")) {
                     t = tokenizer.nextToken(); // t should be <AttributeName>
                     if (t.isPlainText()) {
                         new AlterCMD(ctrl, tableName, t, true);
                     } else throw new DBException("Attribute name is invalid");
-                } else if (t.value.equals("DROP")) {
+                } else if (t.value.equalsIgnoreCase("DROP")) {
+                    t = tokenizer.nextToken(); // t should be <AttributeName>
                     if (t.isPlainText()) {
                         new AlterCMD(ctrl, tableName, t, false);
                     } else throw new DBException("Attribute name is invalid");
@@ -143,15 +143,12 @@ public class Parser {
 
     private void parseInsertCmd(Token t) throws DBException {
         // t should be "INTO"
-        t.value.toUpperCase();
-        if (t.value.equals("INTO")) {
+        if (t.value.equalsIgnoreCase("INTO")) {
             t = tokenizer.nextToken(); // t should be <TableName>
             if (t.isPlainText()) {
                 String tableName = t.value;
                 t = tokenizer.nextToken(); // t should be "VALUES"
-                t.value.toUpperCase();
-                // todo 我没有成功在tokenizer里搞定"VALUE("这个东西。或许变成两个token也没关系。先按两个token写了。
-                if (t.isPlainText() && t.value.equals("VALUES")) {
+                if (t.isPlainText() && t.value.equalsIgnoreCase("VALUES")) {
                     t = tokenizer.nextToken(); // t should be "("
                     if (t.value.equals("(")) {
                         t = tokenizer.nextToken(); // t should be <ValueList>
@@ -165,20 +162,113 @@ public class Parser {
 
     private void parseValueList(Token t, InsertCMD cmd) throws DBException {
 //        t should be <ValueList> -- <Value>
-// todo <ValueList> ::=  <Value> | <Value> "," <ValueList>
-// todo <Value> ::= "'" <StringLiteral> "'" | <BooleanLiteral> | <FloatLiteral> | <IntegerLiteral> | "NULL"
-        if (t.isStringLiteral() || t.isBoolLiteral() || t.isFloatLiberal() || t.isIntegerLiberal()) {
-            cmd.addValue(t.value);
-            t = tokenizer.nextToken(); // t should be "," or ";"
+        if (t.isValue()) {
+            cmd.addValue(t.removeQuoteInToken());
+            t = tokenizer.nextToken(); // t should be "," or ")"
             if (t.value.equals(",")) {
                 t = tokenizer.nextToken(); // t should be <ValueList>
                 parseValueList(t, cmd);
-            } else if (t.value.equals(";")) {
+            } else if (t.value.equals(")")) {
             } else throw new DBException("No ','?");
         } else throw new DBException("The format of value is wrong, please check it");
     }
 
+    private void parseSelectCmd(Token t) throws DBException {
+        // t should be <WildAttribList> -- <AttributeList> or "*"
+        ArrayList<String> attribNames = new ArrayList<>();
+        String tableName;
+        boolean isADD = false;
+        if (t.isPlainText()) {
+            collectAttribName(attribNames, t);
+            // t should be 'FROM' when it goes back
+            t = tokenizer.nextToken(); // t should be TableName
+            if (t.isPlainText()) {
+                tableName = t.value;
+                t = tokenizer.nextToken(); // t should be 'WHERE' or ';'
+                if (t.value.equalsIgnoreCase("WHERE")) {
+                    t = tokenizer.nextToken(); // t should be <Condition>
+                    if (t.isPlainText() || t.value.equals("(")) {
+                        parseCondition(t, tableName, attribNames, isADD);
+                    } else throw new DBException("The format of condition is wrong");
+                } else if (t.value.equals(";")) {
+                    message = new SelectCMD(ctrl, tableName, attribNames,
+                            null, false).query();
+                } else throw new DBException("No 'WHERE' or ';'?");
+            } else throw new DBException("Table name is invalid");
+        } else if (t.value.equals("*")) {
+            t = tokenizer.nextToken(); // t should be 'FROM'
+            if (t.value.equalsIgnoreCase("FROM")) {
+                t = tokenizer.nextToken(); // t should be TableName
+                if (t.isPlainText()) {
+                    tableName = t.value;
+                    t = tokenizer.nextToken(); // t should be 'WHERE' or ';'
+                    if (t.value.equalsIgnoreCase("WHERE")) {
+                        t = tokenizer.nextToken(); // t should be <Condition>
+                        if (t.isPlainText() || t.value.equals("(")) {
+                            parseCondition(t, tableName, attribNames, isADD);
+                        } else throw new DBException("The format of condition is wrong");
+                    } else if (t.value.equals(";")) {
+                        message = new SelectCMD(ctrl, tableName, attribNames,
+                                null, false).query();
+                    } else throw new DBException("No 'WHERE' or ';'?");
+                }
+            } else throw new DBException("No 'FROM'?");
+        } else throw new DBException("No Attribute name or '*'?");
+    }
+
+    private void collectAttribName(ArrayList<String> attributeNames, Token t) throws DBException {
+        // t should be AttributeName
+        attributeNames.add(t.value);
+        t = tokenizer.nextToken(); // t should be ',' or 'FROM'
+        if (t.value.equals(",")) {
+            t = tokenizer.nextToken(); // t should be <AttributeName>
+            if (t.isPlainText()) {
+                collectAttribName(attributeNames, t);
+            } else throw new DBException("Attribute name is invalid");
+        } else if (t.value.equalsIgnoreCase("FROM")) return;
+        else throw new DBException("No ',' or 'FROM'?");
+    }
+
+    private void parseCondition(Token t, String tbName,
+                                ArrayList<String> names, boolean isADD) throws DBException {
+        ArrayList<Condition> conditions = new ArrayList<>();
+        // t should be ( or AttributeName
+        if (t.value.equals("(")) {
+            t = tokenizer.nextToken(); // t should be AttributeName
+            if(t.isPlainText()) {
+                parseCondition(t, tbName, names, isADD);
+            } else throw new DBException("Attribute name is invalid");
+        } else if (t.isPlainText()) {
+            Condition c = new Condition(t.value, null, null);
+            // Now t should be Attribute Name
+            t = tokenizer.nextToken(); // t should be Operator
+            if (t.isOperator()) {
+                c.setOperator(t.value);
+                t = tokenizer.nextToken(); // t should be value
+                if (t.isValue()) {
+                    c.setValue(t.value);
+                    conditions.add(c);
+                    t = tokenizer.nextToken(); // t should be ) or ;
+                    if (t.value.equals(")")) {
+                        t = tokenizer.nextToken(); // t should be AND or OR or ;
+                        if (t.value.equalsIgnoreCase("AND")) {
+                            parseCondition(tokenizer.nextToken(), tbName, names, true);
+                        } else if (t.value.equalsIgnoreCase("OR")) {
+                            parseCondition(tokenizer.nextToken(), tbName, names, false);
+                        } else if (t.value.equals(";")) {
+                            message = new SelectCMD(ctrl, tbName, names, conditions, isADD).query();
+                        } else throw new DBException("No AND or OR?");
+                    } else if (t.value.equals(";")) {
+                        message = new SelectCMD(ctrl, tbName, names, conditions, isADD).query();
+                    } else throw new DBException("No ')'?");
+                } else throw new DBException("Value is invalid");
+            } else throw new DBException("Operator is invalid");
+        } else throw new DBException("No ( or Attribute name?");
+
+    }
+
     public String getMessage() {
+//        System.out.println(message); //todo for test
         return message;
     }
 }

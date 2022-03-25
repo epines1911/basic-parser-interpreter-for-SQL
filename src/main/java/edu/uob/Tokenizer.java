@@ -1,8 +1,6 @@
 package edu.uob;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Tokenizer {
     private LinkedList<Token> tokenList;
@@ -14,26 +12,64 @@ public class Tokenizer {
     }
 
     public void convertCmdToToken(String command) {
-        int i = command.indexOf(";"); //todo maybe could delete? I forget why I set this int.
-        String[] tokens = command.split("\\s+");
-        //todo add new feature: value( -> value (
-        //todo 记得还有其他类似的情况，并且把这部分拆出去单独做个function。
-        ArrayList<String> tokenArrList = new ArrayList<>(List.of(tokens));
-        for (int j = 0; j < tokenArrList.size() - 1; j++) {
-            String clip = tokenArrList.get(j);
-            if (clip.matches("[VALUE\\(]")) {
-                String[] clips = clip.split("\\(");
-                //todo 把当前的VALUE(set成（，然后再在这个位置添加VALUE，那么（将自动延后一个。顺序就对了。没test过记得test
-                tokenArrList.set(j, clips[1]);
-                tokenArrList.add(j, clips[0]);
-            }
-        }
-        // todo this is original version:
-        for (String clip : tokenArrList) {
+        String modifiedCmd = modifySymbolInStr(command);
+        String[] tokens = modifiedCmd.split("\\s+");
+        for (String clip : tokens) {
             Token newToken = new Token(clip);
             tokenList.add(newToken);
         }
-        tokenList.getFirst().value = tokenList.getFirst().value.toUpperCase();
+        if (tokenList.size() > 0) {
+            tokenList.getFirst().value = tokenList.getFirst().value.toUpperCase();
+        }
+        //todo token value for test. delete:
+//        for (int i = 0; i < tokenList.size(); i++) {
+//            System.out.println("token value: " + tokenList.get(i).value);
+//        }
+    }
+
+    private String modifySymbolInStr(String aimString) {
+        char[] chars = aimString.toCharArray();
+        ArrayList<Character> copyChars = new ArrayList<>();
+        for (char character : chars) {
+            copyChars.add(character);
+        }
+        LinkedList<Integer> singleQuotaNum = new LinkedList<>();
+        for (int j = 0; j < copyChars.size(); j++) {
+            char currentChar = copyChars.get(j);
+            if (currentChar == '\'') {
+                singleQuotaNum.add(j);
+                if (singleQuotaNum.size() == 2) {
+                    singleQuotaNum.clear();
+                }
+            }
+            if (singleQuotaNum.size() == 0 &&
+                    (currentChar == ',' || currentChar == '(' || currentChar == ')'
+                    || currentChar == ';')) {
+                copyChars.add(j, ' ');
+                copyChars.add(j+2, ' ');
+                j += 1;
+            } else if (singleQuotaNum.size() == 0 &&
+                    (currentChar == '<' || currentChar == '>' || currentChar == '='
+                            || currentChar == '!')) {
+                if (j+1 < copyChars.size() && copyChars.get(j+1) == '=') {
+                    // There is a '>=' or '<='
+                    copyChars.add(j, ' ');
+                    copyChars.add(j+3, ' ');
+                } else {
+                    // There is a single operator < or >
+                    copyChars.add(j, ' ');
+                    copyChars.add(j+2, ' ');
+                }
+                j += 2;
+            }
+        }
+        String result = "";
+        for (char newCharacter : copyChars) result += newCharacter;
+        return result;
+    }
+
+    private void modifyOperator() {
+        //
     }
 
     public Token nextToken() {

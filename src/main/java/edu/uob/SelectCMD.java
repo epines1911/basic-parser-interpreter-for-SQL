@@ -7,7 +7,8 @@ public class SelectCMD extends DBcmd{
     Table aimTB;
     Table modifiedTB;
     public SelectCMD(DBController ctrl, String tableName,
-                     ArrayList<String> attributeName, ArrayList<Condition> conditions, boolean isADD) {
+                     ArrayList<String> attributeName, ArrayList<Condition> conditions,
+                     boolean isADD) {
         aimTB = (Table) ctrl.getCurrentDB().tables.get(tableName);
         result = "";
         if (attributeName.size() == 0 || attributeName == null) {

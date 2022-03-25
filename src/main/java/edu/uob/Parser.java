@@ -47,8 +47,9 @@ public class Parser {
             case "UPDATE":
                 parseUpdateCmd(tokenizer.nextToken());
                 break;
-//            case "DELETE":
-//                new DeleteCMD();
+            case "DELETE":
+                parseDeleteCmd(tokenizer.nextToken());
+                break;
 //            case "JOIN":
 //                new JoinCMD();
             default:
@@ -258,17 +259,21 @@ public class Parser {
                         } else if (t.value.equalsIgnoreCase("OR")) {
                             parseCondition(tokenizer.nextToken(), tbName, names, false, null);
                         } else if (t.value.equals(";")) {
-                            if (pairs == null) {
+                            if (names != null && pairs == null) {
                                 message = new SelectCMD(ctrl, tbName, names, conditions, isADD).query();
+                            } else if (pairs != null){
+                                new UpdateCMD(ctrl, pairs, tbName, conditions, isADD);
                             } else {
-                                //update
+                                //delete
                             }
                         } else throw new DBException("No AND or OR?");
                     } else if (t.value.equals(";")) {
-                        if (pairs == null) {
+                        if (names != null && pairs == null) {
                             message = new SelectCMD(ctrl, tbName, names, conditions, isADD).query();
+                        } else if (pairs != null){
+                            new UpdateCMD(ctrl, pairs, tbName, conditions, isADD);
                         } else {
-                            // update
+                            //delete
                         }
                     } else throw new DBException("No ')'?");
                 } else throw new DBException("Value is invalid");
@@ -310,6 +315,20 @@ public class Parser {
                 } else throw new DBException("The format of Value is wrong");
             } else throw new DBException("No '='?");
         } else throw new DBException("Attribute name is invalid");
+    }
+
+    private void parseDeleteCmd(Token t) throws DBException {
+        // t should be 'FROM'
+        if (t.value.equalsIgnoreCase("FROM")) {
+            t = tokenizer.nextToken(); // t should be TableName
+            if (t.isPlainText()) {
+                String tbName = t.value;
+                t = tokenizer.nextToken(); // t should be WHERE
+                if (t.value.equalsIgnoreCase("WHERE")) {
+                    parseCondition(tokenizer.nextToken(), tbName, null, false, null);
+                } else throw new DBException("No 'WHERE'?");
+            } else throw new DBException("Table name is invalid");
+        } else throw new DBException("No 'FROM'?");
     }
 
     public String getMessage() {

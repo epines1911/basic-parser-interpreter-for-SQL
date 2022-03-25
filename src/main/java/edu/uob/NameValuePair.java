@@ -1,12 +1,14 @@
 package edu.uob;
 
+import java.util.LinkedList;
+
 public class NameValuePair {
     private String attributeName;
     private String value;
 
-    public NameValuePair(String name, String recordValue) {
+    public NameValuePair(String name, String newName) {
         attributeName = name;
-        value = recordValue;
+        value = newName;
     }
 
     public void setAttributeName(String name){
@@ -17,10 +19,11 @@ public class NameValuePair {
         return attributeName;
     }
 
-    public void setValue(String attributeValue){
-        value = attributeValue;
+    public void setValue(String newName){
+        value = newName;
     }
 
     public String getValue(){
         return value;
-    }}
+    }
+}

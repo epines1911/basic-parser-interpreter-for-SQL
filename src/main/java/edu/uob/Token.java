@@ -1,7 +1,5 @@
 package edu.uob;
 
-import java.util.ArrayList;
-
 public class Token {
     String value;
 
@@ -24,9 +22,13 @@ public class Token {
     public boolean isStringLiteral() {
         if (value == null) {return false;}
         String strForCheck = value;
-        // ('    ') means start and end with '
-        // [^\\d', \"]*? means no ' no " , could be zero [^\\d', \"]
-        return strForCheck.matches("('([^\\d',\"]*?)')");
+        // ^['] means the first character is '
+        // [\\s]* means there is 0 or more space in the string
+        // [a-zA-Z]* means there is 0 or more letters in the string
+        // [^\"\']* means there is 0 or more symbols in the string,
+        // and these symbols won't contain " and '
+        // [']$ means the string ends with '
+        return strForCheck.matches("^['][\\s]*[a-zA-Z]*[^\"\']*[']$");
     }
 
     public boolean isBoolLiteral() {

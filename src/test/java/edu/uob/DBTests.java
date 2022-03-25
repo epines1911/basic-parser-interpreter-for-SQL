@@ -49,13 +49,14 @@ final class DBTests {
   // rows are actually inserted)
   @Test
   void testUseCmd() {
+    assertTrue(server.handleCommand("uSE aa;").startsWith("[OK]"));
     server.handleCommand("Create DATABASE aa;");
     server.handleCommand("uSE aa;");
-    assertTrue(server.handleCommand("uSE aa;").startsWith("[OK]"));
     assertEquals(server.getDbCtrl().getCurrentDB().name, "aa");
   }
   @Test
   void testCreateDB() {
+    assertTrue(server.handleCommand("Create DATABASE aa;").startsWith("[OK]"));
     server.handleCommand("Create DATABASE aa;");
     assertEquals(server.getDbCtrl().getDBByName("aa").name, "aa");
   }
@@ -91,12 +92,19 @@ final class DBTests {
     assertFalse(t.isIntegerLiberal());
   }
 
-//  @ParameterizedTest
-//  @ValueSource(strings = {"'d*&#63('", "'0(09)'", "sd'kf'", "'sdj.'f", "sd'f"})
-//  void testIsStringLiteral1(String clip) {
-//    Token t = new Token(clip);
-//    assertTrue(t.isStringLiteral());
-//  }
+  @ParameterizedTest
+  @ValueSource(strings = {"'d*&#63('", "'0(09)'"})
+  void testIsStringLiteral1(String clip) {
+    Token t = new Token(clip);
+    assertTrue(t.isStringLiteral());
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"sd'kf'", "'sdj.'f", "sd'f"})
+  void testIsStringLiteral2(String clip) {
+    Token t = new Token(clip);
+    assertFalse(t.isStringLiteral());
+  }
 
   @ParameterizedTest
   @ValueSource(strings = {

@@ -16,10 +16,7 @@ public final class DBServer {
   private Database db;
 
   public static void main(String[] args) throws IOException {
-//    new DBServer(Paths.get(".").toAbsolutePath().toFile()).blockingListenOn(8888);
-// todo 上面这行改回来
-    new DBServer(Paths.get("mydb").toAbsolutePath().toFile()).blockingListenOn(8888);
-    //todo 记得删掉mydb文件夹再交
+    new DBServer(Paths.get(".").toAbsolutePath().toFile()).blockingListenOn(8888);
   }
 
   /**

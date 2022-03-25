@@ -99,15 +99,15 @@ final class DBTests {
     assertTrue(t.isStringLiteral());
   }
 
-//  @ParameterizedTest
-//  @ValueSource(strings = {
-//          "Create table people(aa,bb,adfas);",
-//          "INSERT INTO people VALUES((),'d*&#63(','0(09)',TRUE,145.098,0970,',0')",
-//          "select * from sldfj where name==0",
-//          "select * from sldfj where (age<=167)and(gender!='male');"})
-//  void testModifyCommand(String command) {
-//    Tokenizer tokenizer = new Tokenizer(command);
-//  }
+  @ParameterizedTest
+  @ValueSource(strings = {
+          "Create table people(aa,bb,adfas);",
+          "INSERT INTO people VALUES((),'d*&#63(','0(09)',TRUE,145.098,0970,',0')",
+          "select * from sldfj where name==0",
+          "select * from sldfj where (age<=167)and(gender!='male');"})
+  void testModifyCommand(String command) {
+    Tokenizer tokenizer = new Tokenizer(command);
+  }
 
   @Test
   void testMultipleCmds() {

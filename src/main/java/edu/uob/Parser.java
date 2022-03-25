@@ -43,15 +43,15 @@ public class Parser {
             case "SELECT":
                 parseSelectCmd(tokenizer.nextToken());
                 break;
-                //todo
             case "UPDATE":
                 parseUpdateCmd(tokenizer.nextToken());
                 break;
             case "DELETE":
                 parseDeleteCmd(tokenizer.nextToken());
                 break;
-//            case "JOIN":
-//                new JoinCMD();
+            case "JOIN":
+                parseJoinCmd(tokenizer.nextToken());
+                break;
             default:
                 throw new DBException("The first word in command is wrong");
         }
@@ -325,10 +325,41 @@ public class Parser {
                 String tbName = t.value;
                 t = tokenizer.nextToken(); // t should be WHERE
                 if (t.value.equalsIgnoreCase("WHERE")) {
-                    parseCondition(tokenizer.nextToken(), tbName, null, false, null);
+                    parseCondition(tokenizer.nextToken(), tbName, null,
+                            false, null);
                 } else throw new DBException("No 'WHERE'?");
             } else throw new DBException("Table name is invalid");
         } else throw new DBException("No 'FROM'?");
+    }
+
+    private void parseJoinCmd(Token t) throws DBException {
+        // t should be TableName 1
+        if (t.isPlainText()) {
+            String tbName1 = t.value;
+            t = tokenizer.nextToken(); // t should be 'AND'
+            if (t.value.equalsIgnoreCase("AND")) {
+                t = tokenizer.nextToken(); // t should be TableName 2
+                if (t.isPlainText()) {
+                    String tbName2 = t.value;
+                    t = tokenizer.nextToken(); // t should be 'ON'
+                    if (t.value.equalsIgnoreCase("ON")) {
+                        t = tokenizer.nextToken(); // t should be AttributeName 1
+                        if (t.isPlainText()) {
+                            String aName1 = t.value;
+                            t = tokenizer.nextToken(); // t should be AND
+                            if (t.value.equalsIgnoreCase("AND")) {
+                                t = tokenizer.nextToken(); // t should be AttributeName 2
+                                if (t.isPlainText()) {
+                                    String aName2 = t.value;
+                                    message = new JoinCMD(ctrl, tbName1,
+                                            tbName2, aName1, aName2).query();
+                                } else throw new DBException("Attribute name is invalid");
+                            } else throw new DBException("No 'AND'?");
+                        } else throw new DBException("Attribute name is invalid");
+                    } else throw new DBException("No 'ON'?");
+                } else throw new DBException("Table name is invalid");
+            } else throw new DBException("No 'AND'?");
+        } else throw new DBException("Table name is invalid");
     }
 
     public String getMessage() {

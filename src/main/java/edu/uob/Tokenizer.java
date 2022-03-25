@@ -68,10 +68,6 @@ public class Tokenizer {
         return result;
     }
 
-    private void modifyOperator() {
-        //
-    }
-
     public Token nextToken() {
         curIndex += 1; //todo 这个每次调用就+1+1好像有个class的属性或者method能实现？
         if (curIndex < tokenList.size()) {return tokenList.get(curIndex);}

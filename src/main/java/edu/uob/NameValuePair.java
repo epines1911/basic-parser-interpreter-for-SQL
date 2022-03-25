@@ -1,14 +1,12 @@
 package edu.uob;
 
-public class Condition {
+public class NameValuePair {
     private String attributeName;
-    private String operator;
     private String value;
 
-    public Condition(String name, String op, String aimValue) {
+    public NameValuePair(String name, String recordValue) {
         attributeName = name;
-        operator = op;
-        value = aimValue;
+        value = recordValue;
     }
 
     public void setAttributeName(String name){
@@ -19,19 +17,10 @@ public class Condition {
         return attributeName;
     }
 
-    public void setOperator(String operatorSymbol){
-        operator = operatorSymbol;
-    }
-
-    public String getOperator(){
-        return operator;
-    }
-
     public void setValue(String attributeValue){
         value = attributeValue;
     }
 
     public String getValue(){
         return value;
-    }
-}
+    }}

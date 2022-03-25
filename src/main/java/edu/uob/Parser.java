@@ -44,8 +44,9 @@ public class Parser {
                 parseSelectCmd(tokenizer.nextToken());
                 break;
                 //todo
-//            case "UPDATE":
-//                new UpdateCMD();
+            case "UPDATE":
+                parseUpdateCmd(tokenizer.nextToken());
+                break;
 //            case "DELETE":
 //                new DeleteCMD();
 //            case "JOIN":
@@ -188,7 +189,7 @@ public class Parser {
                 if (t.value.equalsIgnoreCase("WHERE")) {
                     t = tokenizer.nextToken(); // t should be <Condition>
                     if (t.isPlainText() || t.value.equals("(")) {
-                        parseCondition(t, tableName, attribNames, isADD);
+                        parseCondition(t, tableName, attribNames, isADD, null);
                     } else throw new DBException("The format of condition is wrong");
                 } else if (t.value.equals(";")) {
                     message = new SelectCMD(ctrl, tableName, attribNames,
@@ -205,7 +206,7 @@ public class Parser {
                     if (t.value.equalsIgnoreCase("WHERE")) {
                         t = tokenizer.nextToken(); // t should be <Condition>
                         if (t.isPlainText() || t.value.equals("(")) {
-                            parseCondition(t, tableName, attribNames, isADD);
+                            parseCondition(t, tableName, attribNames, isADD, null);
                         } else throw new DBException("The format of condition is wrong");
                     } else if (t.value.equals(";")) {
                         message = new SelectCMD(ctrl, tableName, attribNames,
@@ -230,13 +231,14 @@ public class Parser {
     }
 
     private void parseCondition(Token t, String tbName,
-                                ArrayList<String> names, boolean isADD) throws DBException {
+                                ArrayList<String> names, boolean isADD,
+                                ArrayList<NameValuePair> pairs) throws DBException {
         ArrayList<Condition> conditions = new ArrayList<>();
         // t should be ( or AttributeName
         if (t.value.equals("(")) {
             t = tokenizer.nextToken(); // t should be AttributeName
             if(t.isPlainText()) {
-                parseCondition(t, tbName, names, isADD);
+                parseCondition(t, tbName, names, isADD, null);
             } else throw new DBException("Attribute name is invalid");
         } else if (t.isPlainText()) {
             Condition c = new Condition(t.value, null, null);
@@ -252,19 +254,62 @@ public class Parser {
                     if (t.value.equals(")")) {
                         t = tokenizer.nextToken(); // t should be AND or OR or ;
                         if (t.value.equalsIgnoreCase("AND")) {
-                            parseCondition(tokenizer.nextToken(), tbName, names, true);
+                            parseCondition(tokenizer.nextToken(), tbName, names, true, null);
                         } else if (t.value.equalsIgnoreCase("OR")) {
-                            parseCondition(tokenizer.nextToken(), tbName, names, false);
+                            parseCondition(tokenizer.nextToken(), tbName, names, false, null);
                         } else if (t.value.equals(";")) {
-                            message = new SelectCMD(ctrl, tbName, names, conditions, isADD).query();
+                            if (pairs == null) {
+                                message = new SelectCMD(ctrl, tbName, names, conditions, isADD).query();
+                            } else {
+                                //update
+                            }
                         } else throw new DBException("No AND or OR?");
                     } else if (t.value.equals(";")) {
-                        message = new SelectCMD(ctrl, tbName, names, conditions, isADD).query();
+                        if (pairs == null) {
+                            message = new SelectCMD(ctrl, tbName, names, conditions, isADD).query();
+                        } else {
+                            // update
+                        }
                     } else throw new DBException("No ')'?");
                 } else throw new DBException("Value is invalid");
             } else throw new DBException("Operator is invalid");
         } else throw new DBException("No ( or Attribute name?");
 
+    }
+
+    private void parseUpdateCmd(Token t) throws DBException {
+        // t should be TableName
+        if (t.isPlainText()) {
+            String tbName = t.value;
+            t = tokenizer.nextToken(); // t should be SET
+            if (t.value.equalsIgnoreCase("SET")) {
+                t = tokenizer.nextToken(); // t should be NameValueList
+                parseNameValuePair(t, tbName);
+            } else throw new DBException("No 'SET'?");
+        } else throw new DBException("Table name is invalid");
+    }
+
+    private void parseNameValuePair(Token t, String tbName) throws DBException {
+        // t should be NameValueList -- NameValuePair -- AttributeName
+        if (t.isPlainText()) {
+            ArrayList<NameValuePair> pairs = new ArrayList<>();
+            String attribName = t.value;
+            t = tokenizer.nextToken(); // t should be "="
+            if (t.value.equals("=")) {
+                t = tokenizer.nextToken(); // t should be Value
+                if (t.isValue()) {
+                    NameValuePair pair = new NameValuePair(attribName, t.value);
+                    pairs.add(pair);
+                    t = tokenizer.nextToken(); // t should be ',' or 'WHERE'
+                    if (t.value.equals(",")) {
+                        parseNameValuePair(tokenizer.nextToken(), tbName);
+                    } else if (t.value.equalsIgnoreCase("WHERE")) {
+                        parseCondition(tokenizer.nextToken(), tbName,
+                                null, false, pairs);
+                    } else throw new DBException("No ','?");
+                } else throw new DBException("The format of Value is wrong");
+            } else throw new DBException("No '='?");
+        } else throw new DBException("Attribute name is invalid");
     }
 
     public String getMessage() {

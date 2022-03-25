@@ -123,7 +123,25 @@ final class DBTests {
     server.handleCommand("alter table cada add school2;");
     assertTrue(server.handleCommand("select * from cada;").startsWith("[OK]"));
     server.handleCommand("drop database aa;");
-    //todo
+  }
+
+  @Test
+  void testJoinCommand() {
+    server.handleCommand("CREATE DATABASE markbook;");
+    server.handleCommand("USE markbook;");
+    server.handleCommand("CREATE TABLE marks (name, mark, pass);");
+    server.handleCommand("INSERT INTO marks VALUES ('Steve', 65, TRUE);");
+    server.handleCommand("INSERT INTO marks VALUES ('Dave', 55, TRUE);");
+    server.handleCommand("INSERT INTO marks VALUES ('Bob', 35, FALSE);");
+    server.handleCommand("INSERT INTO marks VALUES ('Clive', 20, FALSE);");
+    server.handleCommand("SELECT * FROM marks;");
+    server.handleCommand("CREATE TABLE coursework (task, grade);");
+    server.handleCommand("INSERT INTO coursework VALUES ('OXO', 3);");
+    server.handleCommand("INSERT INTO coursework VALUES ('DB', 1);");
+    server.handleCommand("INSERT INTO coursework VALUES ('OXO', 4);");
+    server.handleCommand("INSERT INTO coursework VALUES ('STAG', 2);");
+    server.handleCommand("SELECT * FROM coursework;");
+    server.handleCommand("JOIN coursework AND marks ON grade AND id;");
   }
 
 }

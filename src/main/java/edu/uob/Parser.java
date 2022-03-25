@@ -264,7 +264,7 @@ public class Parser {
                             } else if (pairs != null){
                                 new UpdateCMD(ctrl, pairs, tbName, conditions, isADD);
                             } else {
-                                //delete
+                                new DeleteCMD(ctrl, tbName, conditions, isADD);
                             }
                         } else throw new DBException("No AND or OR?");
                     } else if (t.value.equals(";")) {
@@ -273,7 +273,7 @@ public class Parser {
                         } else if (pairs != null){
                             new UpdateCMD(ctrl, pairs, tbName, conditions, isADD);
                         } else {
-                            //delete
+                            new DeleteCMD(ctrl, tbName, conditions, isADD);
                         }
                     } else throw new DBException("No ')'?");
                 } else throw new DBException("Value is invalid");

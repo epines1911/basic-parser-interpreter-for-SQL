@@ -34,6 +34,5 @@ public class AlterCMD {
         if (!isFound) {
             throw new DBException("There is no Attribute named " + colName);
         }
-
     }
 }

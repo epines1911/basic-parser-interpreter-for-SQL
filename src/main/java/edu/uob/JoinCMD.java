@@ -16,34 +16,41 @@ public class JoinCMD extends DBcmd{
         tb1 = (Table) ctrl.getCurrentDB().tables.get(tbName1);
         tb2 = (Table) ctrl.getCurrentDB().tables.get(tbName2);
         resultTB = tb1;
+        resultTB.setName("join");
         column1 = setAttribute(tb1, aName1);
         column2 = setAttribute(tb2, aName2);
         indexList = new LinkedList<>();
         result = "";
-        builtResult();
+        builtResult(aName1);
     }
 
     private Attribute setAttribute(Table tb, String attributeName) throws DBException {
         tb.setAttributesName();
         int colNum = tb.getColNum();
         Attribute a = null;
+        boolean isFound = false;
         for (int i = 0; i < colNum; i++) {
             if(tb.valueList.get(i).name.equals(attributeName)) {
+                isFound = true;
                 a = tb.valueList.get(i);
-            } else throw new DBException("Cannot find attribute named" + attributeName);
+            }
+        }
+        if (!isFound) {
+            throw new DBException("Cannot find attribute named " + attributeName);
         }
         return a;
     }
 
-    private void builtResult() throws DBException {
+    private void builtResult(String colNameForDel) throws DBException {
         matchValues();
         int colNum = tb2.getColNum();
         for (int i = 1; i < colNum; i++) {
             resultTB.valueList.add(copyAttribute(i));
         }
+        deleteRepeatCol(resultTB, colNameForDel);
         result += resultTB.createNameRow();
-        int resultColNum = resultTB.getColNum();
-        for (int j = 0; j < resultColNum; j++) {
+        int resultNum = resultTB.valueList.get(0).col.size();
+        for (int j = 0; j < resultNum; j++) {
             result += resultTB.createTableRow(j);
         }
     }
@@ -57,6 +64,22 @@ public class JoinCMD extends DBcmd{
             } else {
                 indexList.add(i);
             }
+        }
+    }
+
+    private void deleteRepeatCol(Table tb, String colName) throws DBException {
+        Boolean isFound = false;
+        for (int i = 0; i < tb.valueList.size(); i++) {
+            String name = tb.valueList.get(i).name;
+            if (name.equals(colName)) {
+                isFound = true;
+                tb.valueList.remove(i);
+                tb.setColNum();
+                tb.deleteAttributeName(colName);
+            }
+        }
+        if (!isFound) {
+            throw new DBException("There is no Attribute named " + colName);
         }
     }
 

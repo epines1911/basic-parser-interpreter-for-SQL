@@ -8,17 +8,15 @@ public class UpdateCMD {
                      String tbName, ArrayList<Condition> conditions,
                      boolean isADD) throws DBException {
         aimTB = (Table) ctrl.getCurrentDB().tables.get(tbName);
-        if (conditions == null) {
-            // update data without conditions
-            updateNoConditions(pairs);
-        }
+        update(pairs, conditions, isADD);
     }
 
-    private void updateNoConditions(ArrayList<NameValuePair> pairs) throws DBException {
-        boolean isFound = false;
+    private void update(ArrayList<NameValuePair> pairs, ArrayList<Condition> conditions,
+                        boolean isADD) throws DBException {
         int colNum = aimTB.getColNum();
         for (NameValuePair pair :
                 pairs) {
+            boolean isFound = false;
             String colName = pair.getAttributeName();
             for (int i = 0; i < colNum; i++) {
                 Attribute a = aimTB.valueList.get(i);

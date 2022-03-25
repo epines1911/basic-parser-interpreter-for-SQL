@@ -3,7 +3,7 @@ package edu.uob;
 import java.util.HashMap;
 
 public class Database {
-    String name; // todo maybe could be deleted
+    String name;
     HashMap<String, Table> tables;
 
     public Database() {

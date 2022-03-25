@@ -7,7 +7,7 @@ public class DeleteCMD {
 
     public DeleteCMD(DBController ctrl, String tbName,
                      ArrayList<Condition> conditions, boolean isADD) throws DBException {
-        aimTB = (Table) ctrl.getCurrentDB().tables.get(tbName);
+        aimTB = ctrl.getCurrentDB().tables.get(tbName);
         matchValue(conditions, isADD);
     }
 

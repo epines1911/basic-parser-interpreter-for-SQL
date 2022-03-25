@@ -3,13 +3,14 @@ package edu.uob;
 import java.util.ArrayList;
 
 public class SelectCMD extends DBcmd{
-    String result;
-    Table aimTB;
-    Table modifiedTB;
+    private String result;
+    private Table aimTB;
+    private Table modifiedTB;
+
     public SelectCMD(DBController ctrl, String tableName,
                      ArrayList<String> attributeName, ArrayList<Condition> conditions,
                      boolean isADD) {
-        aimTB = (Table) ctrl.getCurrentDB().tables.get(tableName);
+        aimTB = ctrl.getCurrentDB().tables.get(tableName);
         result = "";
         if (attributeName.size() == 0 || attributeName == null) {
             if (conditions == null) {

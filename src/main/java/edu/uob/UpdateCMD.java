@@ -3,11 +3,12 @@ package edu.uob;
 import java.util.ArrayList;
 
 public class UpdateCMD {
-    Table aimTB;
+    private Table aimTB;
+
     public UpdateCMD(DBController ctrl, ArrayList<NameValuePair> pairs,
                      String tbName, ArrayList<Condition> conditions,
                      boolean isADD) throws DBException {
-        aimTB = (Table) ctrl.getCurrentDB().tables.get(tbName);
+        aimTB = ctrl.getCurrentDB().tables.get(tbName);
         update(pairs, conditions, isADD);
     }
 

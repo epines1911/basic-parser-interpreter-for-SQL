@@ -13,8 +13,8 @@ public class JoinCMD extends DBcmd{
 
     public JoinCMD(DBController ctrl, String tbName1,
                    String tbName2, String aName1, String aName2) throws DBException {
-        tb1 = (Table) ctrl.getCurrentDB().tables.get(tbName1);
-        tb2 = (Table) ctrl.getCurrentDB().tables.get(tbName2);
+        tb1 = ctrl.getCurrentDB().tables.get(tbName1);
+        tb2 = ctrl.getCurrentDB().tables.get(tbName2);
         resultTB = tb1;
         resultTB.setName("join");
         column1 = setAttribute(tb1, aName1);

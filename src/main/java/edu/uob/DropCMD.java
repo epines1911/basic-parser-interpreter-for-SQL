@@ -1,7 +1,5 @@
 package edu.uob;
 
-import java.awt.*;
-
 public class DropCMD {
     public DropCMD(DBController ctrl, String name, Boolean isDB) throws DBException {
         // if isDB is true, then create a database. Otherwise, create a table.

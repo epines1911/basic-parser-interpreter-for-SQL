@@ -9,7 +9,7 @@ public class InsertCMD {
     private ArrayList<String> values = new ArrayList<>();
     public InsertCMD(DBController ctrl, String tableName) {
         tbName = tableName;
-        aimTB = (Table) ctrl.getCurrentDB().tables.get(tableName);
+        aimTB = ctrl.getCurrentDB().tables.get(tableName);
         valueCounter = 0;
     }
 

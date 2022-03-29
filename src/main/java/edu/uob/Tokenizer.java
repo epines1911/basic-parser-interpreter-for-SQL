@@ -21,10 +21,6 @@ public class Tokenizer {
         if (tokenList.size() > 0) {
             tokenList.getFirst().value = tokenList.getFirst().value.toUpperCase();
         }
-        //todo token value for test. delete:
-//        for (int i = 0; i < tokenList.size(); i++) {
-//            System.out.println("token value: " + tokenList.get(i).value);
-//        }
     }
 
     private String modifySymbolInStr(String aimString) {
@@ -68,12 +64,8 @@ public class Tokenizer {
         return result;
     }
 
-    private void modifyOperator() {
-        //
-    }
-
     public Token nextToken() {
-        curIndex += 1; //todo 这个每次调用就+1+1好像有个class的属性或者method能实现？
+        curIndex += 1;
         if (curIndex < tokenList.size()) {return tokenList.get(curIndex);}
         else {curIndex = tokenList.size() - 1;}
         return null;

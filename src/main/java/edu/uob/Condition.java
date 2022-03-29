@@ -5,10 +5,10 @@ public class Condition {
     private String operator;
     private String value;
 
-    public Condition(String name, String op, String attributeValue) {
+    public Condition(String name, String op, String aimValue) {
         attributeName = name;
         operator = op;
-        value = attributeValue;
+        value = aimValue;
     }
 
     public void setAttributeName(String name){

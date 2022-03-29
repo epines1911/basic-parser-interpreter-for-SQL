@@ -3,17 +3,16 @@ package edu.uob;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class DBController {
-    private Map dbMap;
+    private final HashMap<String, Database> dbMap;
     private Database currentDB;
-    private String topDirectory;
+    private final String topDirectory;
     private String currentDir;
 
     public DBController(String directory) {
-        dbMap = new HashMap();
+        dbMap = new HashMap<>();
         currentDB = null;
         topDirectory = directory;
         currentDir = directory;
@@ -34,7 +33,7 @@ public class DBController {
     }
 
     public Database getDBByName(String name) {
-        return (Database) dbMap.get(name);
+        return dbMap.get(name);
     }
 
     public void removeDB(String name) throws DBException {

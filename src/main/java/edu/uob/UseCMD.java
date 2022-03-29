@@ -11,7 +11,6 @@ public class UseCMD extends DBcmd{
         String dbName = t.value;
         Database db = ctrl.getDBByName(dbName);
         ctrl.setCurrentDB(db);
-        //todo how to tell server that the task has a result?
     }
 
     // <USE> commandType don't need to execute query method

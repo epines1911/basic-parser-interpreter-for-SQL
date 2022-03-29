@@ -3,7 +3,7 @@ package edu.uob;
 public class AlterCMD {
     // if isADD is true, then add a column in a table. Otherwise, delete a column in a table
     public AlterCMD(DBController ctrl, String tbName, Token attributeName, Boolean isADD) throws DBException {
-        Table tb = (Table) ctrl.getCurrentDB().tables.get(tbName);
+        Table tb = ctrl.getCurrentDB().tables.get(tbName);
         if (isADD) { addCol(tb, attributeName.value);}
         else { deleteCol(tb, attributeName.value);}
     }
@@ -34,6 +34,5 @@ public class AlterCMD {
         if (!isFound) {
             throw new DBException("There is no Attribute named " + colName);
         }
-
     }
 }

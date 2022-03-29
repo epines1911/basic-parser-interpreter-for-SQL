@@ -1,13 +1,20 @@
 package edu.uob;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class Database {
-    String name; // todo maybe could be deleted
-    Map tables;
+    String name;
+    HashMap<String, Table> tables;
 
     public Database() {
-        tables = new HashMap();
+        tables = new HashMap<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String DBName) {
+        name = DBName;
     }
 }

@@ -1,5 +1,6 @@
 package edu.uob;
 
+import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,13 +13,10 @@ public final class DBServer {
   private static final char END_OF_TRANSMISSION = 4;
   private Parser p;
   private DBController dbCtrl;
-  private Database db; // todo 后面如果根据名字查找database和table的话，我可以不可以用字典管理这一堆database和table？
+  private Database db;
 
   public static void main(String[] args) throws IOException {
-//    new DBServer(Paths.get(".").toAbsolutePath().toFile()).blockingListenOn(8888);
-// todo 上面这行改回来
-    new DBServer(Paths.get("mydb").toAbsolutePath().toFile()).blockingListenOn(8888);
-    //todo 记得删掉mydb文件夹再交
+    new DBServer(Paths.get(".").toAbsolutePath().toFile()).blockingListenOn(8888);
   }
 
   /**
@@ -118,8 +116,8 @@ public final class DBServer {
   }
 
   private void readFileAndStoreData(String fileName) throws IOException, DBException {
-    // E:\CS-C1021\OOPJava\java-exercise\cwdb-files // todo just a note
-    String filePath = "E:" + File.separator + fileName; //todo
+    // E:\CS-C1021\OOPJava\java-exercise\cwdb-files
+    String filePath = "E:" + File.separator + fileName;
     File newFile = new File(filePath);
     if (newFile.exists()) {
       FileReader reader = new FileReader(newFile);
@@ -136,16 +134,15 @@ public final class DBServer {
         dataInLine = buffReader.readLine().split("\\s+");
       }
       buffReader.close();
-//      System.out.println("test" + newTable.valueList.get(0).col + "\n"); // todo for test
       newTable.setAttributesName();
       newTable.setFirstItemAsNull();
-      db.tables.put("people", newTable); //todo db.addNewTable() 像下面这个一样?
+      db.tables.put("people", newTable);
       dbCtrl.addNewDB("default", db);
     }
   }
 
   private void writer(String fileName, Table aimTable) throws IOException {
-    String filePath = "E:" + File.separator + fileName; //todo
+    String filePath = "E:" + File.separator + fileName;
     File newFile = new File(filePath);
     if (newFile.exists()) {
       aimTable.setFirstItemByName();
@@ -159,7 +156,7 @@ public final class DBServer {
           buffWriter.flush();
           buffWriter.close();
         } else {
-          FileWriter writer = new FileWriter(newFile, true); //todo 非得每次都重建开启append的writer吗？
+          FileWriter writer = new FileWriter(newFile, true);
           BufferedWriter buffWriter = new BufferedWriter(writer);
           buffWriter.append(tableRow);
           buffWriter.flush();

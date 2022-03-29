@@ -22,13 +22,13 @@ public class Table {
 
     private void setIDCol() {
         Attribute id = new Attribute();
-        id.name = "id";
+        id.setName("id");
         valueList.add(0, id);
     }
 
     public void idCounter() {
         id += 1;
-        if (valueList.get(0).name.equalsIgnoreCase("id")) {
+        if (valueList.get(0).getName().equalsIgnoreCase("id")) {
             valueList.get(0).col.add(String.valueOf(id));
         }
     }
@@ -52,9 +52,9 @@ public class Table {
         setColNum();
         for (int i = 0; i < colNum; i++) {
             if (i < attributesName.size()) {
-                attributesName.set(i, valueList.get(i).name);
+                attributesName.set(i, valueList.get(i).getName());
             } else {
-                attributesName.add(i, valueList.get(i).name);
+                attributesName.add(i, valueList.get(i).getName());
             }
         }
     }
@@ -106,6 +106,22 @@ public class Table {
 
     public void newLimitAttrib() {
         // for selecting some columns and make a new table
+    }
+
+    public Attribute getAttributeByName(String name) throws DBException {
+        setColNum();
+        boolean isFound = false;
+        for (int i = 0; i < colNum; i++) {
+            Attribute a = valueList.get(i);
+            if (a.getName().equals(name)) {
+                isFound = true;
+                return a;
+            }
+        }
+        if (!isFound) {
+            throw new DBException("No attribute in this table named " + name);
+        }
+        return null;
     }
 
     public String getName() {

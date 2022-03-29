@@ -21,7 +21,7 @@ public class AlterCMD {
     }
 
     private void deleteCol(Table tb, String colName) throws DBException {
-        Boolean isFound = false;
+        boolean isFound = false;
         for (int i = 0; i < tb.valueList.size(); i++) {
             String name = tb.valueList.get(i).name;
             if (name.equals(colName)) {

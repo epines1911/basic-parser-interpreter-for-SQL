@@ -1,7 +1,5 @@
 package edu.uob;
 
-import java.util.LinkedList;
-
 public class NameValuePair {
     private String attributeName;
     private String value;
